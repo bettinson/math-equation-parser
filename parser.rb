@@ -28,7 +28,6 @@ class AST
 end
 
 class Lexer
-
   def self.lex(string)
     # num is generally an empty string
     # until I find a number, then I keep appending to that
@@ -62,12 +61,11 @@ class Lexer
       when ')'
         tokens << num unless num == ""
         tokens << s
-
         num = ""
       when '\0' #End of string
         tokens << s
       else
-        puts "done?"
+        raise Exception.new("Invalid character")
       end
     end
     return tokens
@@ -87,6 +85,10 @@ class LexerTest < Test::Unit::TestCase
     assert_equal ["(","12","+","1",")"], Lexer.lex("(12+1)")
     assert_equal ["(","1","+","(","1","+","22",")",")"], Lexer.lex("(1+(1+22))")
   end
+
+  def test_exception_on_invalid_character
+    assert_raise (Exception.new("Invalid character")) {Lexer.lex("m")}
+  end
 end
 
 def run_tests
@@ -94,4 +96,3 @@ def run_tests
 end
 
 run_tests
-#Lexer.lex("(1+1)")
