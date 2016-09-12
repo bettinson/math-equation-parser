@@ -28,61 +28,70 @@ class AST
 end
 
 class Lexer
-  @tokens = []
-
-  def initiliaze(string)
-
-  end
 
   def self.lex(string)
     # num is generally an empty string
     # until I find a number, then I keep appending to that
     # until it ends, then I add the number to the string
+    tokens = []
     num = ""
-    for s in string
+    string.split("").each do |s|
       case s
-      when "+"
-        @tokens << s
-        @tokens << num unless num == ""
+      when '+'
+        tokens << num unless num == ""
+        tokens << s
         num = ""
-      when "-"
-        @tokens << s << num
-        @tokens << num unless num == ""
+      when '-'
+        tokens << num unless num == ""
+        tokens << s << num
         num = ""
-      when "*"
-        @tokens << s
-        @tokens << num unless num == ""
+      when '*'
+        tokens << num unless num == ""
+        tokens << s
         num = ""
       when "/"
-        @tokens << s
-        @tokens << num unless num == ""
+        tokens << num unless num == ""
+        tokens << s
         num = ""
       when /\A\d+\z/
         num << s
-      when "("
-        @tokens << s
-        @tokens << num unless num == ""
-        num = ""
-      when ")"
+      when '('
+        tokens << num unless num == ""
         tokens << s
-        @tokens << num unless num == ""
         num = ""
-      when "\n" #End of string
+      when ')'
+        tokens << num unless num == ""
         tokens << s
+
+        num = ""
+      when '\0' #End of string
+        tokens << s
+      else
+        puts "done?"
       end
     end
+    return tokens
   end
-  return @tokens
 end
 
 class LexerTest < Test::Unit::TestCase
-  def should_make_token_array
-    assert ["(","1","+","1",")"] == Lexer.lex("(1+1)")
+  def test_simple_token_array
+    assert_equal ["(","1","+","1",")"], Lexer.lex("(1+1)")
+  end
+
+  def test_complicated_token_arrays
+    assert_equal ["(","1","+","(","1","+","2",")",")"], Lexer.lex("(1+(1+2))")
+  end
+
+  def test_double_digit_numbers
+    assert_equal ["(","12","+","1",")"], Lexer.lex("(12+1)")
+    assert_equal ["(","1","+","(","1","+","22",")",")"], Lexer.lex("(1+(1+22))")
   end
 end
 
 def run_tests
-  Test::Unit::UI::Console::TestRunner.run(LexerTest)
+  Test::Unit::UI::Console::TestRunner.run LexerTest
 end
 
 run_tests
+#Lexer.lex("(1+1)")
