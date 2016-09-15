@@ -1,5 +1,6 @@
 require 'test/unit'
 require 'test/unit/ui/console/testrunner'
+require './lexer.rb'
 
 class Token
   Plus     = 0
@@ -24,54 +25,6 @@ class Token
   end
 end
 
-class AST
-end
-
-class Lexer
-  def self.lex(string)
-    # num is generally an empty string
-    # until I find a number, then I keep appending to that
-    # until it ends, then I add the number to the string
-    tokens = []
-    num = ""
-    string.split("").each do |s|
-      case s
-      when '+'
-        tokens << num unless num == ""
-        tokens << s
-        num = ""
-      when '-'
-        tokens << num unless num == ""
-        tokens << s << num
-        num = ""
-      when '*'
-        tokens << num unless num == ""
-        tokens << s
-        num = ""
-      when "/"
-        tokens << num unless num == ""
-        tokens << s
-        num = ""
-      when /\A\d+\z/
-        num << s
-      when '('
-        tokens << num unless num == ""
-        tokens << s
-        num = ""
-      when ')'
-        tokens << num unless num == ""
-        tokens << s
-        num = ""
-      when '\0' #End of string
-        tokens << s
-      else
-        raise Exception.new("Invalid character")
-      end
-    end
-    return tokens
-  end
-end
-
 class LexerTest < Test::Unit::TestCase
   def test_simple_token_array
     assert_equal ["(","1","+","1",")"], Lexer.lex("(1+1)")
@@ -79,6 +32,10 @@ class LexerTest < Test::Unit::TestCase
 
   def test_complicated_token_arrays
     assert_equal ["(","1","+","(","1","+","2",")",")"], Lexer.lex("(1+(1+2))")
+  end
+
+  def test_complicated_token_arrays_with_space
+    assert_equal ["(","1","+","(","1","+","2",")",")"], Lexer.lex("(1 +(1+2))")
   end
 
   def test_double_digit_numbers
@@ -91,8 +48,29 @@ class LexerTest < Test::Unit::TestCase
   end
 end
 
+class ASTTest < Test::Unit::TestCase
+  def setup
+    @equation = '1 * 20 + 2 * 4'
+  end
+
+  def test_lex_is_lexed
+    assert_equal ['1','*','20','+','2','*','4'], Lexer.lex(@equation)
+  end
+
+  #def test_root_node_is_of_class_node
+  #  ast = AST.new(@equation)
+  #  assert_equal ast.root_node.class, Node
+  #end
+end
+
 def run_tests
   Test::Unit::UI::Console::TestRunner.run LexerTest
+  Test::Unit::UI::Console::TestRunner.run ASTTest
 end
 
 run_tests
+
+equation = "1 * 20 + 3 - 7"
+
+ast = AST.new(equation)
+puts ast.root_node.class
