@@ -1,29 +1,9 @@
+require 'byebug'
 require 'test/unit'
 require 'test/unit/ui/console/testrunner'
 require './lexer.rb'
-
-class Token
-  Plus     = 0
-  Minus    = 1
-  Multiply = 2
-  Divide   = 3
-  Number   = 4
-  LParan   = 5
-  RParan   = 6
-  End      = 7
-
-  attr_accessor :kind
-  attr_accessor :value
-
-  def initialize
-    @kind = nil
-    @value = nil
-  end
-
-  def unknown?
-    @kind.nil?
-  end
-end
+require './ast.rb'
+require './node.rb'
 
 class LexerTest < Test::Unit::TestCase
   def test_simple_token_array
@@ -57,10 +37,10 @@ class ASTTest < Test::Unit::TestCase
     assert_equal ['1','*','20','+','2','*','4'], Lexer.lex(@equation)
   end
 
-  #def test_root_node_is_of_class_node
-  #  ast = AST.new(@equation)
-  #  assert_equal ast.root_node.class, Node
-  #end
+  def test_root_node_is_of_class_node
+   ast = AST.new(@equation)
+   assert_equal ast.root_node.class, Node
+  end
 end
 
 def run_tests
@@ -69,8 +49,3 @@ def run_tests
 end
 
 run_tests
-
-equation = "1 * 20 + 3 - 7"
-
-ast = AST.new(equation)
-puts ast.root_node.class

@@ -1,11 +1,11 @@
-requite './lexer'
+require './lexer'
 
 class AST
-  @root_node = nil
-
   attr_accessor :root_node
 
   def initialize (equation)
+    @root_node = nil
+    @pos = 0
     lexed = Lexer.lex(equation)
     construct_ast(lexed)
   end
@@ -17,7 +17,8 @@ class AST
 
   def parse_pm(lexed)
     left = parse_md(lexed)
-    char = lexed[0]
+    @pos += 1
+    char = lexed[@pos]
     if char == '+'
       node = Node.new(left, parse_pm(lexed[1..-1]), '+')
       return node
@@ -25,28 +26,31 @@ class AST
       node = Node.new(left, parse_pm(lexed[1..-1]), '-')
       return node
     else
-      # Stopping here
-      puts("Hey")
-      parse_md(lexed)
+      @pos -= 1
+      return left
     end
   end
 
   def parse_md(lexed)
     left = parse_literal(lexed)
-    char = lexed[0]
+    @pos += 1
+    char = lexed[@pos]
     if char == '*'
-      node = Node.new(left, parse_pm(lexed[1..-1]), '*')
+      node = Node.new(left, parse_md(lexed[@pos..-1]), '*')
       return node
     elsif char == '/'
-      node = Node.new(left, parse_pm(lexed[1..-1]), '/')
+      node = Node.new(left, parse_md(lexed[@pos..-1]), '/')
       return node
     else
-      return parse_literal(lexed)
+      @pos -= 1
+      return left
     end
   end
 
+  # Look for close paranthesis in parse_pm
+  # Look for open here
   def parse_literal(lexed)
-    char = lexed[0]
+    char = lexed[@pos]
     if char =~ /\A\d+\z/
       return char.to_i
     else
