@@ -7,7 +7,7 @@ class AST
   def initialize (equation)
     @root_node = nil
     @pos = 0
-    @debugging = false
+    @debugging = true
     lexed = Lexer.lex(equation)
     construct_ast(lexed)
   end
@@ -29,12 +29,13 @@ class AST
     @pos += 1
     char = lexed[@pos]
     if char == '+'
-      node = Node.new(left, parse_pm(lexed[@pos..-1]), '+')
+      node = Node.new(left, parse_pm(lexed), '+')
       return node
     elsif char == '-'
-      node = Node.new(left, parse_pm(lexed[@pos..-1]), '-')
+      node = Node.new(left, parse_pm(lexed), '-')
       return node
     else
+      @pos -= 1
       return left
     end
   end
@@ -48,12 +49,13 @@ class AST
     @pos += 1
     char = lexed[@pos]
     if char == '*'
-      node = Node.new(left, parse_md(lexed[@pos..-1]), '*')
+      node = Node.new(left, parse_md(lexed), '*')
       return node
     elsif char == '/'
-      node = Node.new(left, parse_md(lexed[@pos..-1]), '/')
+      node = Node.new(left, parse_md(lexed), '/')
       return node
     else
+      @pos -= 1
       return left
     end
   end
