@@ -7,7 +7,7 @@ class AST
   def initialize (equation)
     @root_node = nil
     @pos = 0
-    @debugging = true
+    @debugging = false
     lexed = Lexer.lex(equation)
     construct_ast(lexed)
   end
@@ -26,8 +26,8 @@ class AST
     end
 
     left = parse_md(lexed)
-    @pos += 1
     char = lexed[@pos]
+    @pos += 1
     if char == '+'
       node = Node.new(left, parse_pm(lexed), '+')
       return node
@@ -46,8 +46,8 @@ class AST
     end
 
     left = parse_literal(lexed)
-    @pos += 1
     char = lexed[@pos]
+    @pos += 1
     if char == '*'
       node = Node.new(left, parse_md(lexed), '*')
       return node
@@ -68,6 +68,7 @@ class AST
     end
 
     char = lexed[@pos]
+    @pos += 1
     if char =~ /\A\d+\z/
       return char.to_i
     else
