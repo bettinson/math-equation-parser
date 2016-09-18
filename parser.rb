@@ -31,6 +31,7 @@ end
 class ASTTest < Test::Unit::TestCase
   def setup
     @equation = '1 * 20 + 2 * 4'
+    @ast = AST.new(@equation)
   end
 
   def test_lex_is_lexed
@@ -38,8 +39,26 @@ class ASTTest < Test::Unit::TestCase
   end
 
   def test_root_node_is_of_class_node
-   ast = AST.new(@equation)
-   assert_equal ast.root_node.class, Node
+   assert_equal @ast.root_node.class, Node
+  end
+
+  def test_root_node_is_plus
+    assert_equal @ast.root_node.value, '+'
+  end
+
+  def test_root_node_has_nodes
+    assert_equal @ast.root_node.left.class, Node
+  end
+
+  def test_ast_is_correct
+    assert_equal @ast.root_node.value, '+'
+    assert_equal @ast.root_node.left.value, '*'
+    assert_equal @ast.root_node.left.left, 1
+    assert_equal @ast.root_node.left.right, 20
+    puts "\n\n\n" + @ast.root_node.right + "\n\n\n"
+    assert_equal @ast.root_node.right.value, '*'
+    assert_equal @ast.root_node.right.left, 2
+    assert_equal @ast.root_node.right.right, 4
   end
 end
 
@@ -48,4 +67,3 @@ def run_tests
   Test::Unit::UI::Console::TestRunner.run ASTTest
 end
 
-run_tests
