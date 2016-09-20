@@ -31,6 +31,7 @@ end
 class ASTTest < Test::Unit::TestCase
   def setup
     @equation = '1 * 20 + 2 * 4'
+    @bracket_equation = '( 1 * 20) + (2 * 4)'
     @ast = AST.new(@equation)
   end
 
@@ -58,6 +59,15 @@ class ASTTest < Test::Unit::TestCase
     assert_equal @ast.root_node.right.value, '*'
     assert_equal @ast.root_node.right.left, 2
     assert_equal @ast.root_node.right.right, 4
+  end
+
+  def test_bracket_ast_is_created
+    assert AST.new(@bracket_equation)
+  end
+
+  def test_root_node_is_bracketed
+    bracket_ast = AST.new(@bracket_equation)
+    assert_equal bracket_ast.root_node.value, '('
   end
 end
 
